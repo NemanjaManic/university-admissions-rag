@@ -19,7 +19,7 @@ Nemanja uči AI inženjering (bootcamp u TypeScript-u) i želi paralelno **ličn
 - `https://ftn.uns.ac.rs/upis/` (glavna stranica, FAQ)
 - `https://ftn.uns.ac.rs/dokumentacija-za-prijavu/`
 - `https://ftn.uns.ac.rs/nacin-polaganja/`
-- `https://ftn.uns.ac.rs/658890732/konkursi` (+ linkovani PDF-ovi konkursa)
+- `https://ftn.uns.ac.rs/konkurs-za-upis-u-i-godinu-svih-stepena-studija-2026/` (+ linkovani PDF-ovi konkursa: OAS-OSS, MAS-MSS, SAS, DAS)
 - `https://ftn.uns.ac.rs/upis/pracenje-prijave-na-konkurs/`
 
 ## Stack (predlog, TypeScript svuda)
