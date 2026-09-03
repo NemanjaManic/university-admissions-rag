@@ -1,0 +1,19 @@
+{
+  "name": "ftn-upis-rag",
+  "version": "1.0.0",
+  "description": "RAG chatbot za informacije o upisu na FTN Novi Sad",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}
