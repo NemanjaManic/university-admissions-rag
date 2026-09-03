@@ -1,4 +1,4 @@
-import { fetchPage  } from "./ingest/fetchPage.js";
+import { fetchPage, findPdfLinks  } from "./ingest/fetchPage.js";
 import { writeFile, mkdir } from "node:fs/promises"
 
   const urls = [
@@ -16,10 +16,11 @@ for (const url of urls) {
     await writeFile(`data/raw/${filename}.json`,
   JSON.stringify(doc, null, 2))
   console.log(`Sacuvano: data/raw/${filename}.json (${doc.text.length} karaktera)`)
-
 }
 
 
+ const pdfLinks = await findPdfLinks("https://ftn.uns.ac.rs/konkurs-za-upis-u-i-godinu-svih-stepena-studija-2026/")
+console.log("PDF linkovi sa konkursne stranice:",  pdfLinks);
 
 
 
