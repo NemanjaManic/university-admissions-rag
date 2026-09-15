@@ -23,6 +23,13 @@ async function extractLines(pdf: Parameters<typeof extractTextItems>[0]): Promis
     return lines
 }
 
+export async function fetchPdfLines(url: string): Promise<string[]> {
+    const response = await fetch(url)
+    const buffer = await response.arrayBuffer()
+    const pdf = await getDocumentProxy(new Uint8Array(buffer))
+    return extractLines(pdf)
+}
+
 export async function fetchPdf(url: string): Promise<RawDocument> {
     const response = await fetch(url)
     const buffer = await response.arrayBuffer()
