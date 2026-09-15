@@ -26,7 +26,7 @@ export async function fetchPage(url: string): Promise<RawDocument> {
     container.find("nav, footer, script, style").remove()
 
     const title = $("title").text().trim()
-    const text = container.text().replace(/\s+/g, " ").trim();
+    const text = container.text().replace(/\s+/g, " ").replace(/<\/?eng>/g, "").trim();
     
     return {
         url,

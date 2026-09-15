@@ -1,73 +1,73 @@
-# FTN Upis RAG Chatbot — plan projekta
+# FTN Upis RAG Chatbot — Project Plan
 
-## Kontekst
+## Context
 
-Nemanja uči AI inženjering (bootcamp u TypeScript-u) i želi paralelno **lični projekat** koji:
-- rešava stvaran problem (informacije o upisu na FTN Novi Sad su razbacane po HTML stranicama i PDF konkursima),
-- ima potencijal da postane realan alat (može se pokazati studentskom parlamentu/FTN-u kao gotov prototip),
-- ga uči RAG od temelja — **ne** da mu Claude napiše ceo sistem.
+Nemanja is learning AI engineering (a TypeScript bootcamp) and wants a parallel **personal project** that:
+- solves a real problem (admissions information for FTN Novi Sad is scattered across HTML pages and PDF konkurs texts),
+- has the potential to become a real tool (could be shown to the student parliament/FTN as a working prototype),
+- teaches him RAG from first principles — **not** Claude writing the whole system for him.
 
-**Ključno pravilo saradnje:** Nemanja trenutno nema dovoljno znanja da samostalno piše kod, pa ovo radimo kao vođeni čas kodiranja, ne kao autonomnu implementaciju:
-- Pre svake faze objašnjavam koncept (šta radimo i zašto) pre nego što napišemo ijednu liniju.
-- Kod pišemo zajedno, malo po malo (funkcija po funkcija, ne ceo fajl odjednom) — ja predlažem/pišem kod uz objašnjenje svake linije/odluke, Nemanja ga otkucava kod sebe (ne copy-paste) da bi mu sintaksa i logika ušle u prste i glavu.
-- Posle svake manje celine, pauza za pitanja pre nego što se nastavi dalje.
-- Cilj nije da projekat bude gotov najbrže moguće, nego da Nemanja na kraju razume i ume da objasni svaki deo sistema.
+**Key collaboration rule:** Nemanja currently doesn't have enough knowledge to write this code solo, so we work as guided coding lessons, not as autonomous implementation:
+- Before each phase, the concept (what we're doing and why) is explained before a single line of code is written.
+- Code is written together, in small pieces (function by function, not a whole file at once) — Claude proposes/explains the code and every line/decision, Nemanja types it himself (not copy-paste) so the syntax and logic actually sink in.
+- After each small unit, there's a pause for questions before moving on.
+- The goal isn't to finish the project as fast as possible — it's for Nemanja to end up understanding and being able to explain every part of the system.
 
-**Budžet:** ovo je lični, ne-plaćen projekat — arhitektura mora da radi sa besplatnim/jeftinim opcijama (lokalni embedding model, jeftin ili besplatan LLM tier), a LLM klijent mora biti lako zamenljiv (thin wrapper) da Nemanja kasnije bira provajdera bez prepravljanja celog sistema.
+**Budget:** this is a personal, unpaid project — the architecture has to work with free/cheap options (a local embedding model, a cheap or free LLM tier), and the LLM client must be easily swappable (a thin wrapper) so Nemanja can later choose a provider without rewriting the whole system.
 
-**Domen podataka (MVP):** sekcija "Upis" na ftn.uns.ac.rs — HTML stranice (prijemni ispit, dokumentacija za prijavu, praćenje prijave, statistika upisa, FAQ) **plus** PDF konkursni tekstovi (osnovne/master/specijalističke/doktorske studije, 2026/27). Otkriveni izvori:
-- `https://ftn.uns.ac.rs/upis/` (glavna stranica, FAQ)
+**Data domain (MVP):** the "Upis" (Admissions) section of ftn.uns.ac.rs — HTML pages (entrance exam, application documentation, application tracking, admissions statistics, FAQ) **plus** PDF konkurs (admissions competition) texts (undergraduate/master/specialist/doctoral studies, 2026/27). Discovered sources:
+- `https://ftn.uns.ac.rs/upis/` (main page, FAQ)
 - `https://ftn.uns.ac.rs/dokumentacija-za-prijavu/`
 - `https://ftn.uns.ac.rs/nacin-polaganja/`
-- `https://ftn.uns.ac.rs/konkurs-za-upis-u-i-godinu-svih-stepena-studija-2026/` (+ linkovani PDF-ovi konkursa: OAS-OSS, MAS-MSS, SAS, DAS)
+- `https://ftn.uns.ac.rs/konkurs-za-upis-u-i-godinu-svih-stepena-studija-2026/` (+ linked konkurs PDFs: OAS-OSS, MAS-MSS, SAS, DAS)
 - `https://ftn.uns.ac.rs/upis/pracenje-prijave-na-konkurs/`
 
-## Stack (predlog, TypeScript svuda)
+## Stack (proposed, TypeScript throughout)
 
-- **Runtime:** Node.js + TypeScript, `tsx` za brzo pokretanje skripti bez build koraka.
-- **Scraping:** `fetch` (native) + `cheerio` za parsiranje HTML-a.
-- **PDF parsing:** `unpdf` ili `pdf-parse` za izvlačenje teksta iz konkursnih PDF-ova.
-- **Embeddings:** lokalni multilingual model preko `@xenova/transformers` (npr. `intfloat/multilingual-e5-small`) — radi na CPU, besplatno, dovoljno dobar za srpski. Ovo rešava i budžet i jezik u jednom potezu.
-- **Vector store (MVP):** PostgreSQL + `pgvector` ekstenzija, pokrenut lokalno u Docker kontejneru (`pgvector/pgvector` image preko `docker-compose.yml`). Node klijent: `pg` (drajver) + SQL upiti sa `<->` operatorom za pretragu po sličnosti. Zahteva Docker Desktop pokrenut pre Faze 4.
-- **LLM za generisanje odgovora:** ostavljamo kao izmenljiv modul (`src/llm/client.ts` sa jednim interfejsom). Predlog za start: Claude Haiku (jeftin) ili proveri besplatan starter kredit na Anthropic/OpenAI konzoli — odluka nije blokirajuća, menja se na jednom mestu.
-- **Interfejs (faza 1):** CLI/REPL u terminalu — bez web UI-ja dok retrieval ne radi dobro.
+- **Runtime:** Node.js + TypeScript, `tsx` for running scripts quickly without a build step.
+- **Scraping:** native `fetch` + `cheerio` for HTML parsing.
+- **PDF parsing:** `unpdf` or `pdf-parse` to extract text from konkurs PDFs.
+- **Embeddings:** a local multilingual model via `@xenova/transformers` (e.g. `intfloat/multilingual-e5-small`) — runs on CPU, free, good enough for Serbian. This solves both the budget and language constraints at once.
+- **Vector store (MVP):** PostgreSQL + the `pgvector` extension, run locally in a Docker container (`pgvector/pgvector` image via `docker-compose.yml`). Node client: `pg` (driver) + SQL queries using the `<->` operator for similarity search. Requires Docker Desktop running before Phase 4.
+- **LLM for answer generation:** kept as a swappable module (`src/llm/client.ts` with a single interface). Suggested starting point: Claude Haiku (cheap) or check free starter credit on the Anthropic/OpenAI console — this decision isn't blocking, and changes in one place.
+- **Interface (Phase 1):** a terminal CLI/REPL — no web UI until retrieval works well.
 
-## Struktura projekta (predlog)
+## Project structure (proposed)
 
 ```
 ftn-upis-rag/
   src/
-    ingest/        # scraping + PDF ekstrakcija -> raw dokumenti sa metapodacima
-    chunk/         # deljenje dokumenata na chunkove
-    embed/         # generisanje embeddinga
-    store/         # pgvector wrapper preko `pg` klijenta (upis/pretraga vektora)
-    retrieve/      # top-k pretraga po upitu
-    llm/           # klijent za generisanje odgovora (provider-agnostic)
-    cli/           # REPL za postavljanje pitanja
-    eval/          # test set pitanja + skripta za merenje kvaliteta
+    ingest/        # scraping + PDF extraction -> raw documents with metadata
+    chunk/         # splitting documents into chunks
+    embed/         # generating embeddings
+    store/         # pgvector wrapper over the `pg` client (writing/searching vectors)
+    retrieve/       # top-k search by query
+    llm/           # answer-generation client (provider-agnostic)
+    cli/           # REPL for asking questions
+    eval/          # test question set + script for measuring quality
   data/
-    raw/           # sirov HTML/PDF sadržaj
-    processed/     # očišćen tekst + chunkovi (JSON)
+    raw/           # raw HTML/PDF content
+    processed/     # cleaned text + chunks (JSON)
 ```
 
-## Faze (svaka faza = objašnjenje koncepta → Nemanja piše kod → review → provera da radi)
+## Phases (each phase = concept explanation → Nemanja writes the code → review → verify it works)
 
-1. **Setup projekta** — `npm init`, TypeScript config, osnovna struktura foldera, git repo. *Provera:* `npm run build`/`tsx src/index.ts` radi bez grešaka.
+1. **Project setup** — `npm init`, TypeScript config, basic folder structure, git repo. *Check:* `npm run build`/`tsx src/index.ts` runs without errors.
 
-2. **Ingestion (scraping + PDF)** — funkcije koje preuzimaju svaku HTML stranicu, čiste je (skidaju nav/footer, ostavljaju glavni sadržaj), i posebno preuzimaju/parsiraju PDF konkurse. Svaki dokument čuva `{ url, title, text, fetchedAt }`. *Provera:* pokrenuti skriptu, dobiti N `.json` fajlova u `data/raw/` sa čitljivim tekstom.
+2. **Ingestion (scraping + PDF)** — functions that fetch each HTML page, clean it (strip nav/footer, keep the main content), and separately fetch/parse the konkurs PDFs. Every document stores `{ url, title, text, fetchedAt }`. *Check:* run the script, get N `.json` files in `data/raw/` with readable text.
 
-3. **Chunking** — deljenje teksta na semantičke delove (~300-500 tokena, sa preklapanjem), svaki chunk nosi metapodatke izvora (URL + naslov sekcije) radi kasnijeg citiranja. *Provera:* ispisati par chunkova i ručno oceniti da li imaju smisla kao samostalne celine.
+3. **Chunking** — splitting text into semantic pieces (~300-500 tokens, with overlap), each chunk carrying source metadata (URL + section title) for later citation. *Check:* print a few chunks and manually judge whether they make sense as standalone units.
 
-4. **Embeddings + vector store** — generisanje vektora za svaki chunk lokalnim modelom, upis u Postgres/pgvector bazu (pokrenutu preko `docker compose up`). *Provera:* `docker compose up` diže bazu, baza sadrži očekivan broj redova, upit direktno (preko `psql` ili skripte) vraća rezultate.
+4. **Embeddings + vector store** — generate a vector for each chunk with the local model, write them into a Postgres/pgvector database (started via `docker compose up`). *Check:* `docker compose up` starts the database, the database holds the expected number of rows, querying directly (via `psql` or a script) returns results.
 
-5. **Retrieval** — funkcija koja embeduje pitanje i vraća top-k najsličnijih chunkova. *Provera:* ručno postaviti par pitanja ("koji je rok za upis", "koliko poena je potrebno za budžet") i proveriti da li se vraćaju relevantni chunkovi.
+5. **Retrieval** — a function that embeds a question and returns the top-k most similar chunks. *Check:* manually ask a few questions ("what's the admissions deadline," "how many points are needed for a budget spot") and check whether relevant chunks come back.
 
-6. **Generisanje odgovora sa citatima** — prompt koji kombinuje pitanje + retrieved chunkove, poziva LLM, vraća odgovor sa linkom na izvor. *Provera:* CLI REPL postavlja pitanje, dobija odgovor koji zvuči tačno i navodi izvor.
+6. **Answer generation with citations** — a prompt that combines the question + retrieved chunks, calls the LLM, and returns an answer with a link to the source. *Check:* the CLI REPL asks a question, gets back an answer that sounds correct and cites a source.
 
-7. **Evaluacija kvaliteta** — set od ~20-30 realnih pitanja o upisu sa očekivanim činjenicama/izvorima; skripta koja proverava da li je pravi izvor u top-k i da li odgovor sadrži očekivane činjenice. *Provera:* eval izveštaj sa % tačnosti, koristi se da se doradi chunking/retrieval (RAG quality iteracija).
+7. **Quality evaluation** — a set of ~20-30 realistic admissions questions with expected facts/sources; a script that checks whether the right source is in the top-k and whether the answer contains the expected facts. *Check:* an eval report with an accuracy %, used to refine chunking/retrieval (RAG quality iteration).
 
-8. **(Kasnije, van MVP-a)** — web chat UI, deploy, zaštita od prompt injection-a iz scrape-ovanog sadržaja, keširanje/osvežavanje podataka kad FTN promeni konkurs. Ne radimo ovo dok faze 1-7 ne rade solidno.
+8. **(Later, out of MVP scope)** — web chat UI, deployment, protection against prompt injection from scraped content, caching/refreshing data when FTN updates a konkurs. Not doing this until phases 1-7 work solidly.
 
-## Verifikacija na kraju svake faze
+## Verification at the end of each phase
 
-Svaka faza ima konkretnu, runnable proveru (navedeno gore) — pokretanje skripte i pregled izlaza u terminalu/JSON fajlu, bez potrebe za UI dok ne stignemo do faze 8.
+Every phase has a concrete, runnable check (listed above) — running a script and reviewing the output in the terminal/JSON file, no UI needed until phase 8.

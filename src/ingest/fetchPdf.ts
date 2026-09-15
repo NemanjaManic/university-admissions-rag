@@ -1,5 +1,27 @@
-import { extractText, getDocumentProxy  } from "unpdf";
+import { extractText, extractTextItems, getDocumentProxy  } from "unpdf";
 import type { RawDocument } from "./fetchPage.js"
+
+
+
+
+async function extractLines(pdf: Parameters<typeof extractTextItems>[0]): Promise<string[]>{
+    const { items } = await extractTextItems(pdf)
+    const lines: string[] = []
+    let current = ""
+
+    for (const page of items){ 
+        for(const item of page) {
+            current += item.str
+            if (item.hasEOL) {
+                lines.push(current)
+                current = ""
+            }
+        }
+    }
+    if (current) lines.push(current)
+
+    return lines
+}
 
 export async function fetchPdf(url: string): Promise<RawDocument> {
     const response = await fetch(url)
